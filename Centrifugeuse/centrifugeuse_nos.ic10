@@ -1,0 +1,82 @@
+alias self db
+
+define MAXSETTINGS 100
+define TIME 20
+define STEP 10
+
+alias throttle r0
+alias limiter r1
+alias rpm r2
+alias diff r3
+alias currentTime r4
+alias stress r5
+alias lastStress r6
+alias seuilThrottle r7
+alias seuilLimiter r8
+alias okUp r9
+
+l lastStress self Stress
+l seuilThrottle self Throttle
+l seuilLimiter self CombustionLimiter
+
+move currentTime 0
+move okUp 0
+
+ start:
+yield
+l throttle self Throttle
+l limiter self CombustionLimiter
+l stress self Stress
+
+sub diff stress lastStress #difference
+bgtz diff down #stress montant
+j up
+
+#Monter la puissance
+ up:
+bgtz currentTime end #trop raproche
+bgtzal okUp changeSeuil #on stock le dernier seuil
+move okUp 1
+move currentTime TIME
+beq limiter MAXSETTINGS end #deja au max
+beq throttle MAXSETTINGS limiterup #throttle au max
+j throttleup #on augmente throttle
+
+ changeSeuil:
+move seuilThrottle throttle
+move seuilLimiter limiter
+j ra
+
+ limiterup:
+add limiter limiter STEP
+s self CombustionLimiter limiter
+j end
+
+ throttleup:
+add throttle throttle STEP
+s self Throttle throttle
+j end
+
+#Baisser la puissance
+ down:
+move currentTime 0
+move okUp 0
+beqz throttle end
+beqz limiter throttledown
+j limiterdown
+
+ throttledown:
+move throttle seuilThrottle
+s self Throttle throttle
+j end
+
+ limiterdown:
+move limiter seuilLimiter
+s self CombustionLimiter limiter
+j end
+
+#Fin de la boucle
+ end:
+sub currentTime currentTime 1
+move lastStress stress
+j start
