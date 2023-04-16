@@ -1,0 +1,58 @@
+alias tankChaud d0
+alias avFroid d1
+alias valveFroid d2
+
+define maxTemp 293.15
+define minPressure 1
+
+alias temp r0
+alias tropChaud r1
+alias memTropChaud r2
+alias pressure r3
+alias canClean r4
+alias memCanClean r5
+alias bonneTemp r6
+
+move memTropChaud 0
+move memCanClean 0
+
+ start:
+yield
+
+l temp tankChaud Temperature
+l pressure tankChaud Pressure
+sgt canClean pressure minPressure
+#flush si bonne temp et bonne pression
+slt bonneTemp temp maxTemp
+and canClean canClean bonneTemp
+bneal canClean memCanClean changeValve
+#refroidit si trop chaud et bonne pression
+sgt canClean pressure minPressure
+sgt tropChaud temp maxTemp
+and tropChaud tropChaud canClean
+bneal tropChaud memTropChaud changeVent
+j start
+
+ changeVent:
+push ra
+bgtzal tropChaud ventOn
+beqzal tropChaud ventOff
+pop ra
+move memTropChaud tropChaud
+j ra
+
+ ventOn:
+s avFroid Mode 1
+s avFroid On 1
+j ra
+
+ ventOff:
+s avFroid Mode 0
+sleep 3
+s avFroid On 0
+j ra
+
+ changeValve:
+s valveFroid On canClean
+move memCanClean canClean
+j ra
