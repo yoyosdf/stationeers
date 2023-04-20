@@ -1,0 +1,93 @@
+define lights 1514476632
+define occSensors 322782515
+define sensors -1252983604
+define regs 209854039
+define backRegs -1149857558
+define filtrations -348054045
+define liquidRegs 482248766
+define hydroTray -1841632400
+define fridges 958476921
+
+define minPressure 100
+define maxPressure 103
+define maxRatioO2 0.2
+define minRatioO2 0.05
+
+alias needOn r0
+alias memLights r1
+alias memPressurize r2
+alias memFlush r3
+alias pressure r4
+alias ratioO2 r5
+alias memWaterPress r6
+alias opened r7
+alias memOpened r8
+
+ start:
+yield
+#Gestion lumieres
+lb needOn occSensors Activate Maximum
+bneal needOn memLights changeLights
+#Gestion pression
+lb pressure sensors Pressure Maximum
+slt needOn pressure minPressure
+bneal needOn memPressurize changePressure
+sgt needOn pressure maxPressure
+bneal needOn memFlush changeFlush
+#Gestion Filtration Oxygene
+lb ratioO2 sensors RatioOxygen Maximum
+bgtal ratioO2 maxRatioO2 filterOn
+bltal ratioO2 minRatioO2 filterOff
+#Gestion pression eau
+lb pressure hydroTray Pressure Maximum
+slt needOn pressure minPressure
+bneal needOn memWaterPress changeWaterPressure
+#Gestion frigo
+#lb opened fridges Open Maximum
+#bneal opened memOpened changeFridge
+j start
+
+changeFridge:
+push ra
+bgtzal opened fridgeOpen
+beqzal opened fridgeClose
+move memOpened opened
+pop ra
+j ra
+
+ fridgeOpen:
+sb fridges On 1
+j ra
+
+ fridgeClose:
+sleep 1
+sb fridges On 0
+j ra
+
+ changeLights:
+sb lights On needOn
+move memLights needOn
+j ra
+
+ changePressure:
+sb regs On needOn
+move memPressurize needOn
+j ra
+
+ changeFlush:
+sb backRegs On needOn
+move memFlush needOn
+j ra
+
+ filterOn:
+sb filtrations On 1
+j ra
+
+ filterOff:
+sb filtrations On 0
+j ra
+
+ changeWaterPressure:
+sb liquidRegs On needOn
+move memWaterPress needOn
+j ra
