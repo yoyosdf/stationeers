@@ -1,0 +1,94 @@
+define gasSensors -1252983604
+define sensors 322782515
+define lights 1514476632
+define regs 209854039
+define backRegs -1149857558
+define filtrations -348054045
+define growLights -1758710260
+
+define minP 95
+define maxP 98
+define lightTime 1200
+define darkTime 600
+
+alias occupied r0
+alias memOccupied r1
+alias pressure r2
+alias needP r3
+alias memNeedP r4
+alias needD r5
+alias memNeedD r6
+alias ratioVOL r7
+alias needFilter r8
+alias memNeedFilter r9
+alias count r10
+alias isLight r11
+alias needLight r12
+alias needDark r13
+
+move count 0
+move isLight 1
+ start:
+yield
+#Gestion lumieres
+lb occupied sensors Activate Maximum
+sgtz occupied occupied #utile quand ya 2 personnes
+bneal occupied memOccupied changeLights
+
+#Gestion pression
+lb pressure gasSensors Pressure Maximum
+slt needP pressure minP
+bneal needP memNeedP changeP
+sgt needD pressure maxP
+bneal needD memNeedD changeD
+
+#Gestion Filtration Oxygene
+lb ratioVOL gasSensors RatioVolatiles Maximum
+sgtz needFilter ratioVOL
+bneal needFilter memNeedFilter changeFilter
+
+#Gestion pousse
+sge needLight count lightTime
+and needLight needLight isLight
+bgtzal needLight growLightsOff
+
+sge needLight count darkTime
+seqz needDark isLight
+and needDark needDark needLight
+bgtzal needDark growLightsOn
+
+add count count 1
+s db Setting count
+j start
+
+ changeLights:
+sb lights On occupied
+move memOccupied occupied
+j ra
+
+ changeP:
+sb regs On needP
+move memNeedP needP
+j ra
+
+ changeD:
+sb backRegs On needD
+move memNeedD needD
+j ra
+
+ changeFilter:
+sb filtrations On needFilter
+move memNeedFilter needFilter
+j ra
+
+ growLightsOff:
+sb growLights On 0
+move isLight 0
+move count 0
+j ra
+
+ growLightsOn:
+sb growLights On 1
+move isLight 1
+move count 0
+j ra
