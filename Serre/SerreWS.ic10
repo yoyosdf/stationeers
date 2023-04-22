@@ -3,7 +3,6 @@ define sensors 322782515
 define lights 1514476632
 define regs 209854039
 define backRegs -1149857558
-define filtrations -348054045
 define growLights -1758710260
 
 define minP 95
@@ -18,7 +17,6 @@ alias needP r3
 alias memNeedP r4
 alias needD r5
 alias memNeedD r6
-alias ratioVOL r7
 alias needFilter r8
 alias memNeedFilter r9
 alias count r10
@@ -41,11 +39,6 @@ slt needP pressure minP
 bneal needP memNeedP changeP
 sgt needD pressure maxP
 bneal needD memNeedD changeD
-
-#Gestion Filtration Oxygene
-lb ratioVOL gasSensors RatioVolatiles Maximum
-sgtz needFilter ratioVOL
-bneal needFilter memNeedFilter changeFilter
 
 #Gestion pousse
 sge needLight count lightTime
@@ -74,11 +67,6 @@ j ra
  changeD:
 sb backRegs On needD
 move memNeedD needD
-j ra
-
- changeFilter:
-sb filtrations On needFilter
-move memNeedFilter needFilter
 j ra
 
  growLightsOff:
