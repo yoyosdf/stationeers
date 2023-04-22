@@ -1,0 +1,17 @@
+alias occupied r2
+alias memOccupied r3
+
+define sensor 322782515
+define lights 797794350
+
+ start:
+yield
+lb occupied sensor Activate Maximum
+bneal occupied memOccupied changeLights
+j start
+
+
+ changeLights:
+sb lights On occupied
+move memOccupied occupied
+j ra
