@@ -6,12 +6,14 @@ define backRegs -1149857558
 define filtrations -348054045
 define liquidRegs 482248766
 define hydroTray -1841632400
-define fridges 958476921
+define growLights -1758710260
 
 define minPressure 100
 define maxPressure 103
 define maxRatioO2 0.2
 define minRatioO2 0.05
+define lightTime 960
+define darkTime 600
 
 alias needOn r0
 alias memLights r1
@@ -20,9 +22,15 @@ alias memFlush r3
 alias pressure r4
 alias ratioO2 r5
 alias memWaterPress r6
-alias opened r7
-alias memOpened r8
+alias cTemp r0
+alias maxTemp r1
+alias cMode r2
 
+move cMode 1 #allumé
+move maxTemp lightTime #temp max jour
+
+ reset:
+move cTemp 0
  start:
 yield
 #Gestion lumieres
@@ -42,27 +50,12 @@ bltal ratioO2 minRatioO2 filterOff
 lb pressure hydroTray Pressure Maximum
 slt needOn pressure minPressure
 bneal needOn memWaterPress changeWaterPressure
-#Gestion frigo
-#lb opened fridges Open Maximum
-#bneal opened memOpened changeFridge
+
+#Gestion pousse
+bge cTemp maxTemp changeGLights
+add cTemp cTemp 1
+s db Setting maxTemp
 j start
-
-changeFridge:
-push ra
-bgtzal opened fridgeOpen
-beqzal opened fridgeClose
-move memOpened opened
-pop ra
-j ra
-
- fridgeOpen:
-sb fridges On 1
-j ra
-
- fridgeClose:
-sleep 1
-sb fridges On 0
-j ra
 
  changeLights:
 sb lights On needOn
@@ -91,3 +84,9 @@ j ra
 sb liquidRegs On needOn
 move memWaterPress needOn
 j ra
+
+ changeGLights:
+select maxTemp cMode darkTime lightTime
+sne cMode cMode 1 #inverse
+s growLights On cMode
+j reset
