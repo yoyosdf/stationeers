@@ -1,0 +1,21 @@
+alias Self db
+
+define minRatio 0.001
+define maxRatio 0.009
+
+alias ratioVOL r0
+
+ start:
+yield
+l ratioVOL Self RatioVolatilesInput
+bgt ratioVOL maxRatio filterOn
+blt ratioVOL minRatio filterOff
+j start
+
+ filterOn:
+s Self Mode 1
+j start
+
+ filterOff:
+s Self Mode 0
+j start
