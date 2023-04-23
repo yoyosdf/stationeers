@@ -1,0 +1,25 @@
+#Filtre CO2 et X
+alias self db
+
+alias ratio r0
+alias needFilterX r1
+alias needFilterCO2 r2
+alias needOn r3
+alias memNeedOn r4
+
+define maxRatio 0.1
+
+start:
+yield
+l ratio self RatioPollutantInput
+sgtz needFilterX ratio
+l ratio self RatioCarbonDioxideInput
+sgt needFilterCO2 ratio maxRatio
+or needOn needFilterX needFilterCO2
+bneal needOn memNeedOn changeFilter
+j start
+
+changeFilter:
+s self Mode needOn
+move memNeedOn needOn
+j ra
