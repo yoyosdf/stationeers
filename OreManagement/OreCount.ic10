@@ -1,0 +1,20 @@
+define dial 554524804
+define silos 1155865682
+
+sb dial Mode 100
+
+alias exportOreCount r0
+alias mCountSetting r1
+alias cCountSetting r2
+
+ reset:
+sb silos ClearMemory 1
+sb silos Open 0
+move mCountSetting cCountSetting
+ start:
+yield
+lb cCountSetting dial Setting Maximum
+bne cCountSetting mCountSetting reset
+lb exportOreCount silos ExportCount Sum
+beq exportOreCount mCountSetting reset
+j start
