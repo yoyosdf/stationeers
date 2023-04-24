@@ -1,0 +1,79 @@
+alias filN2 d0
+alias filO2 d1
+alias filCO2 d2
+alias icTankAir d3
+
+define gasSensors -1252983604
+define pr 209854039
+define tPump 1310794736
+define bpr -1149857558
+
+define minP 100
+define maxP 103
+define ratioN2Max 0.67
+define ratioO2Max 0.32
+define ratioCO2Max 0.07
+
+alias baseP r0
+alias needOn r1
+alias memNeedP r2
+alias memNeedD r3
+alias ratio r4
+
+ start:
+yield
+#gestion pression
+lb baseP gasSensors Pressure Maximum
+#pression haute
+sgt needOn baseP maxP
+bneal needOn memNeedD changeD
+#reset chaque filtration
+s filCO2 Mode 0
+s filO2 Mode 0
+s filN2 Mode 0
+#test sur le tank
+l needOn icTankAir Setting
+beqz needOn stopAll #on s'arrete si trop bas
+#pression basse
+slt needOn baseP minP
+bneal needOn memNeedP changeP
+#gestion ratio CO2
+lb ratio gasSensors RatioCarbonDioxide Maximum
+bgt ratio ratioCO2Max filterCO2
+#sinon gestion ratio O2
+lb ratio gasSensors RatioOxygen Maximum
+bgt ratio ratioO2Max filterO2
+#sinon gestion ratio N2
+lb ratio gasSensors RatioNitrogen Maximum
+bgt ratio ratioN2Max filterN2
+j start
+
+ changeP:
+sb pr On needOn
+sb tPump On needOn
+move memNeedP needOn
+j ra
+
+ changeD:
+sb bpr On needOn
+move memNeedD needOn
+j ra
+
+ filterCO2:
+s db Setting ratio
+s filCO2 Mode 1
+j start
+
+ filterO2:
+s filO2 Mode 1
+j start
+
+ filterN2:
+s filN2 Mode 1
+j start
+
+ stopAll:
+sb pr On 0
+sb tPump On 0
+move memNeedP 0
+j start

@@ -1,0 +1,64 @@
+alias tankAir d0
+alias pumpN2 d1
+alias pumpO2 d2
+alias pumpCO2 d3
+
+alias occupied r2
+alias memOccupied r3
+
+define sensor 322782515
+define lights 797794350
+define consoles 801677497
+define pipeAnalyzers 435685051
+
+define minN2P 2000
+define minRatioO2 0.3
+define minRatioCO2 0.05
+
+alias pressure r0
+alias needN2 r1
+alias ratioO2 r2
+alias ratioCO2 r3
+
+ start:
+yield
+#Lumieres et consoles
+lb occupied sensor Activate Maximum
+bneal occupied memOccupied changeLights
+#Tank air N2
+l pressure tankAir Pressure
+blt pressure minN2P addN2
+s pumpN2 On 0
+#Tank air O2
+l ratioO2 tankAir RatioOxygen
+blt ratioO2 minRatioO2 addO2
+s pumpO2 On 0
+#Tank air CO2
+l ratioCO2 tankAir RatioCarbonDioxide
+blt ratioCO2 minRatioCO2 addCO2
+s pumpCO2 On 0
+s db Setting 1
+j start
+
+
+ changeLights:
+sb lights On occupied
+sb consoles On occupied
+sb pipeAnalyzers On occupied
+move memOccupied occupied
+j ra
+
+ addN2:
+s db Setting 0
+s pumpN2 On 1
+j start
+
+ addO2:
+s db Setting 0
+s pumpO2 On 1
+j start
+
+ addCO2:
+s db Setting 0
+s pumpCO2 On 1
+j start
