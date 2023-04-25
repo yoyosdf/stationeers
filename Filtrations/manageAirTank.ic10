@@ -10,6 +10,7 @@ define sensor 322782515
 define lights 797794350
 define consoles 801677497
 define pipeAnalyzers 435685051
+define wLights -1860064656
 
 define minN2P 2000
 define minRatioO2 0.3
@@ -45,6 +46,7 @@ j start
 sb lights On occupied
 sb consoles On occupied
 sb pipeAnalyzers On occupied
+sb wLights On occupied
 move memOccupied occupied
 j ra
 
