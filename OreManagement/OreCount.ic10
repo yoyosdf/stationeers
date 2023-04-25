@@ -1,5 +1,10 @@
 define dial 554524804
 define silos 1155865682
+define leds -815193061
+
+define white 6
+define green 2
+define yellow 5
 
 sb dial Mode 100
 
@@ -10,11 +15,14 @@ alias cCountSetting r2
  reset:
 sb silos ClearMemory 1
 sb silos Open 0
+sb leds Setting 0
+sb leds Color white
 move mCountSetting cCountSetting
  start:
 yield
 lb cCountSetting dial Setting Maximum
 bne cCountSetting mCountSetting reset
 lb exportOreCount silos ExportCount Sum
+sb leds Setting exportOreCount
 beq exportOreCount mCountSetting reset
 j start
