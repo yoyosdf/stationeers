@@ -1,0 +1,53 @@
+alias tFuel d0
+alias pVOL d1
+alias pO2 d2
+
+alias tFuelNOS d3
+alias pVOLNOS d4
+alias pNOS d5
+
+define minFuel 1000
+define minRatioO2 0.33
+define minRatioNOS 0.5
+
+alias tPressure r0
+alias tRatio r1
+
+ start:
+yield
+l tPressure tFuel Pressure
+blt tPressure minFuel prepare
+s pVOL On 0
+l tRatio tFuel RatioOxygen
+blt tRatio minRatioO2 equilibrate
+s pO2 On 0
+
+l tPressure tFuelNOS Pressure
+blt tPressure minFuel prepareNOS
+s pVOLNOS On 0
+l tRatio tFuelNOS RatioNitrousOxide
+blt tRatio minRatioNOS equilibrateNOS
+s pNOS On 0
+
+s db Setting 0
+j start
+
+ prepare:
+s db Setting 1
+s pVOL On 1
+j start
+
+ equilibrate:
+s db Setting 1
+s pO2 On 1
+j start
+
+ prepareNOS:
+s db Setting 1
+s pVOLNOS On 1
+j start
+
+ equilibrateNOS:
+s db Setting 1
+s pNOS On 1
+j start
