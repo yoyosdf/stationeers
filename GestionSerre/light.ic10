@@ -1,0 +1,30 @@
+#gère l'allumage et l'éteignage de la lampe horticole
+alias GrowLight d1
+
+define MAXLIGHT 480
+define MAXDARK 300
+
+alias elapsed r0
+alias lightOn r1
+
+ start:
+sleep 1
+add elapsed elapsed 1
+s db Setting elapsed
+l lightOn GrowLight On
+bgtz lightOn checkLight
+j checkDark
+
+ checkLight:
+blt elapsed MAXLIGHT start
+s GrowLight On 0
+j reset
+
+ checkDark:
+blt elapsed MAXDARK start
+s GrowLight On 1
+j reset
+
+ reset:
+move elapsed 0
+j start

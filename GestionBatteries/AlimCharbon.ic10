@@ -1,0 +1,23 @@
+#script permet d'allumer le gén a charbon quand les batteries sont faibles
+alias battery d0
+alias generator d1
+
+define MIN.RATIO 0.75
+define MAX.RATIO 0.999
+
+alias charge r0
+
+start:
+yield
+l charge battery Ratio
+bgt charge MAX.RATIO stopGen
+blt charge MIN.RATIO startGen
+j start
+
+stopGen:
+s generator On 0
+j start
+
+startGen:
+s generator On 1
+j start
