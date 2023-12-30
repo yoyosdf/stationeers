@@ -1,0 +1,55 @@
+alias stackerOn r0
+alias machineOn r1
+alias occupied r2
+alias memOccupied r3
+
+define STACKERS 1585641623
+define AUTOLATHES 336213101
+define ELECTROPRINTS 1307165496
+define PIPEBENDERS -1888248335
+define ICHOUSING -128473777
+
+define ICTA HASH("IC Autolathe")
+define ICIE HASH("IC Electro Print")
+define ICCH HASH("IC Pipe Bender")
+
+define SENSORS 322782515
+define LIGHTS 797794350
+
+ start:
+yield
+lb occupied SENSORS Activate Maximum
+bne occupied memOccupied changeLights
+lb machineOn AUTOLATHES On Maximum
+bgtz machineOn icAOn
+lb machineOn ELECTROPRINTS On Maximum
+bgtz machineOn icEOn
+lb machineOn PIPEBENDERS On Maximum
+bgtz machineOn icPOn
+lb stackerOn STACKERS On Maximum
+beqz stackerOn icOff
+yield
+j start
+
+ changeLights:
+sb LIGHTS On occupied
+move memOccupied occupied
+j ra
+
+ icOff:
+sbn ICHOUSING ICTA On 0
+sbn ICHOUSING ICIE On 0
+sbn ICHOUSING ICCH On 0
+j start
+
+ icAOn:
+sbn ICHOUSING ICTA On 1
+j start
+
+icEOn:
+sbn ICHOUSING ICIE On 1
+j start
+
+icPOn:
+sbn ICHOUSING ICCH On 1
+j start

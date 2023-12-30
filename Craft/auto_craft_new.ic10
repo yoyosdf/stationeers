@@ -1,0 +1,97 @@
+define TIMERTICKS 60
+define MAXSETTING 500
+alias Fab d1
+alias Stack d2
+
+alias on r0
+alias offTimer r1
+alias activate r2
+alias stateOn r3
+alias stateActivate r4
+alias count r5
+alias wantedCount r6
+alias open r7
+alias stackFlushCount r8
+
+move offTimer 0
+
+start:
+yield
+l on Fab On
+bne on stateOn changeState
+continue:
+beqz on machineOff
+j machineOn
+
+stopMachine:
+s Fab On 0
+machineOff:
+l on Stack On
+beqz on start
+s Stack On 0
+j start
+
+machineOn:
+l on Stack On
+bgtz on checkActivate
+s Stack On 1
+checkActivate:
+l activate Fab Activate
+bne activate stateActivate changeStateActivate
+checkOpen:
+l open Fab Open
+bgtz open needFlush
+beqz activate checkTimer
+j checkCount
+
+needFlush:
+s db Setting 100
+l count Stack Setting
+blt count MAXSETTING maxSettingStack
+yield
+l count Fab ExportCount
+l stackFlushCount Stack ExportCount
+beq count stackFlushCount stopFlush
+s Stack Activate 1
+j start
+
+stopFlush:
+s Fab Open 0
+s Stack Setting wantedCount
+j start
+
+checkCount:
+l wantedCount Stack Setting
+l count Fab ExportCount
+bge count wantedCount export
+j start
+
+export:
+s Fab Activate 0
+sleep 1
+s Stack Activate 1
+j start
+
+checkTimer:
+add offTimer offTimer 1
+s db Setting offTimer
+bge offTimer TIMERTICKS stopMachine
+j start
+
+changeState:
+move stateOn on
+move offTimer 0
+j continue
+
+changeStateActivate:
+move stateActivate activate
+move offTimer 0
+s Fab ClearMemory 1
+j checkOpen
+
+maxSettingStack:
+l wantedCount Stack Setting
+s Fab ClearMemory 1
+s Stack ClearMemory 1
+s Stack Setting MAXSETTING
+j start

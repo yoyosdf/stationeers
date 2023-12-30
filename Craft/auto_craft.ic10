@@ -1,0 +1,54 @@
+alias Fab d1
+alias Stack d2
+
+alias LastCount r0
+alias SelCount r1
+alias FabOn r3
+alias FabCount r4
+alias NeedFlush r6
+alias StackCount r7
+
+s Fab ClearMemory 1
+move LastCount 0
+
+ wait:
+yield
+ start:
+l FabOn Fab On
+s Stack On FabOn
+beqz FabOn wait
+l NeedFlush Fab Open
+bgtz NeedFlush flush
+
+l SelCount Stack Setting
+bne LastCount SelCount reset
+l FabCount Fab ExportCount
+bge FabCount SelCount export
+j start
+
+ export:
+s Fab Open 0
+s Fab Activate 0
+sleep 1
+s Fab On 0
+s Stack Activate 1
+sleep 2
+ cancelflush:
+s Stack Setting LastCount
+ reset:
+s Fab ClearMemory 1
+move LastCount SelCount
+j start
+
+ flush:
+l LastCount Stack Setting
+s Fab ClearMemory 1
+s Stack ClearMemory 1
+s Stack Setting 500
+ continueflush:
+sleep 1
+l FabCount Fab ExportCount
+l StackCount Stack ExportCount
+s Stack Activate 1
+blt StackCount FabCount continueflush
+j export
