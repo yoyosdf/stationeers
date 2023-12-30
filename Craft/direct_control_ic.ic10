@@ -1,0 +1,66 @@
+define AUTOLATHE 3622
+define ELECTROPRINT 3609
+define PIPEBENDER 3604
+
+define ASTACKER 15970
+define ESTACKER 15973
+define PSTACKER 15976
+
+define ICA 35115
+define ICE 35116
+define ICP 35117
+
+alias machineOn r1
+alias occupied r2
+alias memOccupied r3
+
+define SENSORS 322782515
+define LIGHTS 797794350
+
+ start:
+yield
+lb occupied SENSORS Activate Maximum
+bne occupied memOccupied changeLights
+ld machineOn AUTOLATHE On
+bgtzal machineOn icAOn
+ld machineOn ASTACKER On
+beqzal machineOn icAOff
+ld machineOn ELECTROPRINT On
+bgtzal machineOn icEOn
+ld machineOn ESTACKER On
+beqzal machineOn icEOff
+ld machineOn PIPEBENDER On
+bgtzal machineOn icPOn
+ld machineOn PSTACKER On
+beqzal machineOn icPOff
+j start
+
+ changeLights:
+sb LIGHTS On occupied
+move memOccupied occupied
+j ra
+
+ icAOn:
+sd ICA On 1
+j ra
+
+ icAOff:
+sd ICA On 0
+j ra
+
+ icEOn:
+s db Setting 100
+sd ICE On 1
+j ra
+
+ icEOff:
+sd ICE On 0
+j ra
+
+ icPOn:
+sd ICP On 1
+j ra
+
+ icPOff:
+sd ICP On 0
+j ra
