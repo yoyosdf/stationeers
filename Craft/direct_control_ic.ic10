@@ -11,19 +11,21 @@ define ICE 35116
 define ICP 35117
 
 define SENSORS 322782515
-define LIGHTS 797794350
+define LIGHTS 1514476632
+define TIMERTICKS 10
 
 alias machine r0
 alias stacker r1
 alias icShip r2
 alias on r3
 alias occupied r4
-alias memOccupied r5
+alias offTimer r5
 
 start:
 yield
 lb occupied SENSORS Activate Maximum
-bne occupied memOccupied changeLights
+lb on LIGHTS On Maximum
+bne occupied on changeLights
 move machine AUTOLATHE
 move stacker ASTACKER
 move icShip ICA
@@ -39,8 +41,12 @@ jal checkMachine
 j start
 
 changeLights:
+bgtz occupied continueLights
+add offTimer offTimer 1
+blt offTimer TIMERTICKS ra
+continueLights:
+move offTimer 0
 sb LIGHTS On occupied
-move memOccupied occupied
 j ra
 
 checkMachine:
