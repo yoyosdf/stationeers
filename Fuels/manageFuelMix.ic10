@@ -1,10 +1,10 @@
-alias tankFuel d0
-alias pFuelMix d1
-alias memO2Temp d2
-alias tankVol d3
+alias pipeVOL d0
+alias pipeO2 d1
+alias fuelMixer d2
+alias pipeFuel d3
 
-define minFuel 1000
-define ratio1 0.33
+define MAXFUELPRESSURE 5000
+define RATIOO2 0.33
 
 alias pressure r0
 alias a r2
@@ -15,23 +15,23 @@ alias temp2 r6
 
  start:
 yield
-l pressure tankFuel Pressure
-blt pressure minFuel prepare
-s pFuelMix On 0
+l pressure pipeFuel Pressure
+blt pressure MAXFUELPRESSURE prepare
+s fuelMixer On 0
 s db Setting 0
 j start
 
  prepare:
 
-l temp1 memO2Temp Setting #temp O2
-mul a ratio1 temp1
-sub b 1 ratio1
-l temp2 tankVol Temperature
+l temp1 pipeO2 Temperature #temp O2
+mul a RATIOO2 temp1
+sub b 1 RATIOO2
+l temp2 pipeVOL Temperature
 mul b b temp2
 add b a b
 div ratio2 a b
 mul ratio2 ratio2 100 #sur 100
-s pFuelMix Setting ratio2
-s pFuelMix On 1
+s fuelMixer Setting ratio2
+s fuelMixer On 1
 s db Setting 1
 j start
