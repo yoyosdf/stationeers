@@ -1,0 +1,29 @@
+alias growLight d0
+
+define MAXLIGHT 600
+define MAXDARK 300
+
+alias elapsed r0
+alias lightOn r1
+
+ start:
+sleep 1
+add elapsed elapsed 1
+s db Setting elapsed
+l lightOn growLight On
+bgtz lightOn checkLight
+j checkDark
+
+ checkLight:
+blt elapsed MAXLIGHT start
+s growLight On 0
+j reset
+
+ checkDark:
+blt elapsed MAXDARK start
+s growLight On 1
+j reset
+
+ reset:
+move elapsed 0
+j start

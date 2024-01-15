@@ -1,0 +1,24 @@
+alias clim db
+alias extSensor d0
+alias intSensor d1
+
+define MAXEXTTEMP 403.15
+define MININTTEMP 294.15
+define PVENT -1129453144
+
+alias needCool r0
+alias temp r1
+alias canCool r2
+
+sb PVENT Mode 1
+
+start:
+yield
+l temp extSensor Temperature
+slt canCool temp MAXEXTTEMP
+l temp intSensor Temperature
+sgt needCool temp MININTTEMP
+and canCool canCool needCool
+sb PVENT On canCool
+s clim Mode canCool
+j start
