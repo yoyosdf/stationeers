@@ -1,0 +1,63 @@
+define IN.V 5685
+define OUT.V 5687
+define IN.D 5651
+define OUT.D 5830
+
+alias sensor d0
+alias button d1
+
+define OUT.P 34397
+define IN.P 34396
+
+sd OUT.D Lock 1
+sd OUT.D Mode 1
+sd IN.D Lock 1
+sd IN.D Mode 1
+
+define INT.POS 0
+define EXT.POS 1
+
+alias currentPos r0
+alias btPressed r1
+alias sasPressure r2
+alias currentV r3
+alias currentP r4
+alias currentD r5
+alias isOpen r6
+
+#init de la position du sas
+move currentPos EXT.POS
+jal switchDevices
+start:
+yield
+l btPressed button Activate
+beqz btPressed start
+depressurize:
+sd currentD Open 0
+sd currentV Mode 1
+sd currentV On 1
+yield
+l sasPressure sensor Pressure
+brgtz sasPressure -2
+sd currentV On 0
+#dpressuris
+jal switchDevices
+pressurize:
+sd currentV Mode 0
+sd currentV On 1
+sd currentP On 1
+yield
+ld sasPressure currentP Pressure
+brgtz sasPressure -2
+sd currentV On 0
+#pressuris
+sd currentD Open 1
+sd currentP On 0
+j start
+
+switchDevices:
+seqz currentPos currentPos
+select currentD currentPos OUT.D IN.D
+select currentV currentPos OUT.V IN.V
+select currentP currentPos OUT.P IN.P
+j ra
