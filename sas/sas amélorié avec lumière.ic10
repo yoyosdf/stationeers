@@ -1,0 +1,85 @@
+define IN.V 58519
+define OUT.V 58518
+define IN.D 55169
+define OUT.D 55168
+define OUT.P 58573
+define IN.P 58574
+define SENSORS 322782515
+define LIGHTS 1436121888
+
+alias sensor d0
+
+sd OUT.D Mode 1
+sd IN.D Mode 1
+
+define INT.POS 0
+define EXT.POS 1
+
+alias currentPos r0
+alias setting r1
+alias sasPressure r2
+alias currentV r3
+alias currentP r4
+alias currentD r5
+alias closedD r6
+alias isOpen r7
+alias occupied r8
+alias on r9
+alias in.pos r1
+alias out.pos r0
+
+#init de la position du sas
+jal readDevices
+start:
+yield
+lb occupied SENSORS Activate Maximum
+lb on LIGHTS On Maximum
+bneal occupied on changeLights
+ld isOpen closedD Open
+ld setting closedD Setting
+beq isOpen setting start
+depressurize:
+sd currentD Open 0
+sd currentV Mode 1
+sd currentV On 1
+yield
+l sasPressure sensor Pressure
+brgtz sasPressure -2
+sd currentV On 0
+#dpressuris
+jal switchDevices
+pressurize:
+sd currentV Mode 0
+sd currentV On 1
+sd currentP On 1
+yield
+ld sasPressure currentP Pressure
+brgtz sasPressure -2
+sd currentV On 0
+#pressuris
+sd currentD Open 1
+sd currentP On 0
+j start
+
+readDevices:
+ld out.pos OUT.D Open
+ld in.pos IN.D Open
+beq out.pos in.pos resetDevices
+j selectDevices
+resetDevices:
+sd OUT.D Open 0
+sd IN.D Open 1
+move currentPos 0
+j selectDevices
+switchDevices:
+seqz currentPos currentPos
+selectDevices:
+select currentD currentPos OUT.D IN.D
+select currentV currentPos OUT.V IN.V
+select currentP currentPos OUT.P IN.P
+select closedD currentPos IN.D OUT.D
+j ra
+
+changeLights:
+sb LIGHTS On occupied
+j ra
