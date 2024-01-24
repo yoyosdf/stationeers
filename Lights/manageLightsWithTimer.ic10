@@ -1,8 +1,10 @@
 define LIGHTS -1860064656
 define SENSORS 322782515
+define TIMEROFF 10
 
 alias on r0
 alias occupied r1
+alias offTimer r2
 
 start:
 yield
@@ -12,5 +14,10 @@ bne on occupied changeLights
 j start
 
 changeLights:
+bgtz occupied continueLights
+add offTimer offTimer 1
+blt offTimer TIMEROFF start
+continueLights:
 sb LIGHTS On occupied
+move offTimer 0
 j start
