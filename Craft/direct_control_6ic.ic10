@@ -1,0 +1,89 @@
+define AUTOLATHE 604
+define ELECTROPRINT 2853
+define PIPEBENDER 3131
+
+define ASTACKER 3833
+define ESTACKER 15710
+define PSTACKER 15713
+
+define ICA 19450
+define ICE 19451
+define ICP 19452
+
+define AUTOLATHE2 925
+define ELECTROPRINT2 2127
+define PIPEBENDER2 23045
+
+define ASTACKER2 17855
+define ESTACKER2 17858
+define PSTACKER2 23253
+
+define ICA2 32985
+define ICE2 32986
+define ICP2 32987
+
+define SENSORS 322782515
+define LIGHTS -1860064656
+define TIMERTICKS 10
+
+alias machine r0
+alias stacker r1
+alias icShip r2
+alias on r3
+alias occupied r4
+alias offTimer r5
+
+start:
+yield
+lb occupied SENSORS Activate Maximum
+lb on LIGHTS On Maximum
+bne occupied on changeLights
+move machine AUTOLATHE
+move stacker ASTACKER
+move icShip ICA
+jal checkMachine
+move machine ELECTROPRINT
+move stacker ESTACKER
+move icShip ICE
+jal checkMachine
+move machine PIPEBENDER
+move stacker PSTACKER
+move icShip ICP
+jal checkMachine
+move machine AUTOLATHE2
+move stacker ASTACKER2
+move icShip ICA2
+jal checkMachine
+move machine ELECTROPRINT2
+move stacker ESTACKER2
+move icShip ICE2
+jal checkMachine
+move machine PIPEBENDER2
+move stacker PSTACKER2
+move icShip ICP2
+jal checkMachine
+j start
+
+changeLights:
+bgtz occupied continueLights
+add offTimer offTimer 1
+blt offTimer TIMERTICKS ra
+continueLights:
+move offTimer 0
+sb LIGHTS On occupied
+j ra
+
+checkMachine:
+ld on machine On
+bgtz on icOn
+ld on stacker On
+beqz on icOff
+j ra
+
+ icOn:
+sd icShip On 1
+j ra
+
+ icOff:
+sd icShip On 0
+j ra
