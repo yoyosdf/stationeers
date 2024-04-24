@@ -1,0 +1,56 @@
+alias Sensor d0
+#alias AnalyzerConso d1
+#alias AnalyzerProd d2
+
+#alias LEDConso d3
+#alias LEDCharge d4
+#alias LEDProd d5
+
+alias SolarAngleV r0
+alias SolarAngleH r1
+alias Inf0 r2
+alias Conso r3
+alias Prod r4
+alias RatioCharge r5
+alias IsSupOrInf r6
+
+define SensorHCompensator 90
+define SensorVCompensator 90
+define SolarPanel -1545574413
+
+#s LEDConso Mode 2
+#s LEDConso Color 4
+#s LEDProd Mode 2
+#s LEDCharge Mode 1
+#s LEDCharge Color 6
+
+ start:
+
+l SolarAngleV Sensor Vertical
+sub SolarAngleV SensorVCompensator SolarAngleV
+jal checkV
+sb SolarPanel Vertical SolarAngleV
+
+l SolarAngleH Sensor Horizontal
+add SolarAngleH SensorHCompensator SolarAngleH
+s db Setting SolarAngleH
+sb SolarPanel Horizontal SolarAngleH
+
+#l Conso AnalyzerConso PowerRequired
+#s LEDConso Setting Conso
+
+#lb RatioCharge -1388288459 Ratio 0
+#s LEDCharge Setting RatioCharge
+
+#l Prod AnalyzerProd PowerPotential
+#s LEDProd Setting Prod
+
+yield
+j start
+
+ checkV:
+sgt IsSupOrInf SolarAngleV 165
+select SolarAngleV IsSupOrInf 165 SolarAngleV
+slt IsSupOrInf SolarAngleV 15
+select SolarAngleV IsSupOrInf 15 SolarAngleV
+j ra
