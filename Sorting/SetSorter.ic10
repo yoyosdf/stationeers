@@ -1,0 +1,19 @@
+define oreClass 9
+define operator Equals
+
+#tri des minerais
+sll r0 oreClass 16
+sll r1 operator 8
+or r0 r0 r1
+or r0 r0 SorterInstruction.FilterSortingClassCompare
+
+put d0 0 r0 #ajout de la premiere regle
+
+define ingotClass 3
+sll r0 ingotClass 16
+or r0 r0 r1
+or r0 r0 SorterInstruction.FilterSortingClassCompare
+
+put d0 1 r0 #ajout de la 2e regle
+
+s d0 Mode 1 #une des regles vrai
