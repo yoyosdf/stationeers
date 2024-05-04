@@ -1,0 +1,83 @@
+define centrifuge1 59478
+define centrifuge2 59483
+define centrifuge3 59485
+define centrifuge4 59496
+define centrifuge5 59626
+define centrifuge6 60651
+define centrifuge7 60654
+define centrifuge8 60660
+define centrifuge9 60665
+define centrifuge10 60671
+define centrifuge11 71186
+define centrifuge12 71190
+define centrifuge13 71202
+define centrifuge14 71209
+define centrifuge15 71212
+define centrifuge16 71594
+define centrifuge17 71598
+define centrifuge18 71601
+define centrifuge19 71604
+define centrifuge20 71607
+define MAXREAGENTS 400
+
+alias nbReagents r0
+alias centrifuge r1
+
+start:
+yield
+move centrifuge centrifuge1
+jal checkCentrifuge
+move centrifuge centrifuge2
+jal checkCentrifuge
+move centrifuge centrifuge3
+jal checkCentrifuge
+move centrifuge centrifuge4
+jal checkCentrifuge
+move centrifuge centrifuge5
+jal checkCentrifuge
+move centrifuge centrifuge6
+jal checkCentrifuge
+move centrifuge centrifuge7
+jal checkCentrifuge
+move centrifuge centrifuge8
+jal checkCentrifuge
+move centrifuge centrifuge9
+jal checkCentrifuge
+move centrifuge centrifuge10
+jal checkCentrifuge
+move centrifuge centrifuge11
+jal checkCentrifuge
+move centrifuge centrifuge12
+jal checkCentrifuge
+move centrifuge centrifuge13
+jal checkCentrifuge
+move centrifuge centrifuge14
+jal checkCentrifuge
+move centrifuge centrifuge15
+jal checkCentrifuge
+move centrifuge centrifuge16
+jal checkCentrifuge
+move centrifuge centrifuge17
+jal checkCentrifuge
+move centrifuge centrifuge18
+jal checkCentrifuge
+move centrifuge centrifuge19
+jal checkCentrifuge
+move centrifuge centrifuge20
+jal checkCentrifuge
+j start
+
+checkCentrifuge:
+ld nbReagents centrifuge Reagents
+push ra
+bgeal nbReagents MAXREAGENTS purgeCentrifuge
+pop ra
+j ra
+
+purgeCentrifuge:
+sd centrifuge Open 1
+yield
+ld nbReagents centrifuge Reagents
+brge nbReagents 1 -2
+sd centrifuge Open 0
+j ra
