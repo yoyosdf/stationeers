@@ -1,0 +1,46 @@
+define LIGHTS 1436121888
+define SENSORS 322782515
+define TIMEROFF 10
+define MAXINTTEMP 298.15
+define MININTTEMP 296.15
+define MAXEXTTEMP 273.15
+define AV -1129453144
+
+alias airSensor d0
+alias extSensor d1
+
+alias on r0
+alias occupied r1
+alias offTimer r2
+
+alias intTemp r3
+alias extTemp r4
+
+start:
+yield
+lb occupied SENSORS Activate Maximum
+lb on LIGHTS On Maximum
+bneal on occupied changeLights
+l intTemp airSensor Temperature
+bgtal intTemp MAXINTTEMP checkExt
+bltal intTemp MININTTEMP stopVents
+j start
+
+checkExt:
+l extTemp extSensor Temperature
+bgt extTemp MAXEXTTEMP ra
+sb AV On 1
+j ra
+
+stopVents:
+sb AV On 0
+j ra
+
+changeLights:
+bgtz occupied continueLights
+add offTimer offTimer 1
+blt offTimer TIMEROFF ra
+continueLights:
+sb LIGHTS On occupied
+move offTimer 0
+j ra
