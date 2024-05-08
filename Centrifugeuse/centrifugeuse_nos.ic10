@@ -14,7 +14,8 @@ alias lastStress r6
 alias seuilThrottle r7
 alias seuilLimiter r8
 alias okUp r9
-
+alias on r10
+  init:
 l lastStress self Stress
 l seuilThrottle self Throttle
 l seuilLimiter self CombustionLimiter
@@ -24,6 +25,8 @@ move okUp 0
 
  start:
 yield
+l on self On
+beqz on init
 l throttle self Throttle
 l limiter self CombustionLimiter
 l stress self Stress
