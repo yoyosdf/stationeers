@@ -1,23 +1,24 @@
-push 59478
-push 59483
-push 59485
-push 59496
-push 59626
-push 60651
-push 60654
-push 60660
-push 60665
-push 60671
-push 71186
-push 71190
-push 71202
-push 71209
-push 71212
-push 71594
-push 71598
-push 71601
-push 71604
-push 71607
+#Affiche sur une console le nombre de reagents dans une centrifugeuse selectionnee
+push 130086
+push 130887
+#push 59485
+#push 59496
+#push 59626
+#push 60651
+#push 60654
+#push 60660
+#push 60665
+#push 60671
+#push 71186
+#push 71190
+#push 71202
+#push 71209
+#push 71212
+#push 71594
+#push 71598
+#push 71601
+#push 71604
+#push 71607
 
 alias dial d0
 alias ledIndex d1
@@ -27,16 +28,21 @@ alias nbReagents r0
 alias centrifuge r1
 alias currentIndex r2
 
-s dial Mode 20
+s dial Mode 2
 
 start:
 yield
-l currentIndex dial Setting
-s db Setting currentIndex
-move sp currentIndex
-yield
-pop centrifuge
-l nbReagents centrifuge Reagents
-s ledIndex Setting currentIndex
+l sp dial Setting
+beqz sp stop
+s ledIndex On 1
+s ledQuantity On 1
+peek centrifuge
+ld nbReagents centrifuge Reagents
+s ledIndex Setting sp
 s ledQuantity Setting nbReagents
+j start
+
+stop:
+s ledIndex On 0
+s ledQuantity On 0
 j start
