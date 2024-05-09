@@ -1,0 +1,47 @@
+define centrifuge1 130086
+define centrifuge2 130887
+#define centrifuge3 59485
+define MAXREAGENTS 3000
+define CENTRIFUGES 1238905683
+
+alias silo d0
+alias nbReagents r0
+alias centrifuge r1
+alias rpm r2
+alias occupied r3
+alias open r4
+
+start:
+yield
+lbs occupied CENTRIFUGES 0 Occupied Minimum
+seqz open occupied
+s silo Open open
+move centrifuge centrifuge1
+jal checkCentrifugez
+move centrifuge centrifuge2
+jal checkCentrifuge
+#move centrifuge centrifuge3
+#jal checkCentrifuge
+j start
+
+checkCentrifuge:
+ld nbReagents centrifuge Reagents
+push ra
+bgeal nbReagents MAXREAGENTS purgeCentrifuge
+pop ra
+j ra
+
+purgeCentrifuge:
+sd centrifuge On 0
+sd centrifuge Throttle 0
+sd centrifuge CombustionLimiter 0
+yield
+ld rpm centrifuge Rpm
+brge rpm 1 -2
+sd centrifuge Open 1
+yield
+ld nbReagents centrifuge Reagents
+brge nbReagents 1 -2
+sd centrifuge Open 0
+sd centrifuge On 1
+j ra
