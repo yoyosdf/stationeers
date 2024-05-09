@@ -1,0 +1,84 @@
+#permet d'afficher le nombre de minerai dans un silo et demander
+push 63007
+push 63028
+push 63029
+push 63037
+push 63040
+push 63043
+push 63124
+push 63126
+push 63128
+push 63130
+
+push 1758427767
+push 1724793494
+push -707307845
+push -1348105509
+push 1103972403
+push -916518678
+push 1830218956
+push -190236170
+push -983091249
+push -1516581844
+
+push 126716
+
+alias dialSilo d0
+alias dialQuantity d1
+alias demandBtn d2
+alias hashDisplay d3
+alias hashQuantity d4
+
+s dialSilo Mode 10
+s dialQuantity Mode 100
+
+alias currentSilo r0
+alias currentHash r4
+alias quantityNeeded r1
+alias requested r2
+alias quantityExported r3
+alias siloQuantity r5
+alias secondSilo r6 #utile si plus d'un silo
+alias secondQuantity r7 #quantite du 2e silo
+
+stopAll:
+s hashDisplay On 0
+s hashQuantity On 0
+start:
+yield
+l sp dialSilo Setting
+beqz sp stopAll
+s hashDisplay On 1
+s hashQuantity On 1
+peek currentSilo
+add sp sp 10
+peek currentHash
+s db Setting currentHash
+ld siloQuantity currentSilo Quantity
+brne sp 11 5 #si different de fer on multiplie direct
+add sp sp 10
+peek secondSilo
+ld secondQuantity secondSilo Quantity
+add siloQuantity siloQuantity secondQuantity
+mul siloQuantity siloQuantity 50
+s hashQuantity Setting siloQuantity
+l requested demandBtn Activate
+bgtz requested request
+j start
+
+request:
+l sp dialSilo Setting
+beqz sp done
+pop currentSilo
+l quantityNeeded dialQuantity Setting
+beqz quantityNeeded done
+sd currentSilo ClearMemory 1
+ld quantityExported currentSilo ExportCount
+bge quantityExported quantityNeeded done
+sd currentSilo Open 1
+yield
+sd currentSilo Open 0
+jr -5
+done:
+move currentSilo 0
+j start
