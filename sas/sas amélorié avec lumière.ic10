@@ -1,9 +1,9 @@
-define IN.V 58519
-define OUT.V 58518
-define IN.D 55169
-define OUT.D 55168
-define OUT.P 58573
-define IN.P 58574
+define IN.V 37715
+define OUT.V 37714
+define IN.D 37678
+define OUT.D 37677
+define OUT.P 39708
+define IN.P 39709
 define SENSORS 322782515
 define LIGHTS 1436121888
 
@@ -53,6 +53,7 @@ sd currentV Mode 0
 sd currentV On 1
 sd currentP On 1
 yield
+sd currentV PressureExternal 200
 ld sasPressure currentP Pressure
 brgtz sasPressure -2
 sd currentV On 0
