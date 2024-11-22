@@ -1,0 +1,41 @@
+alias wStation d0
+alias hardSuit d1
+
+define TIMESTEP 100
+define LIMITTIME 60
+
+alias mode r0
+alias sound r1
+alias remainingTime r2
+alias modTime r3
+
+start:
+yield
+l mode wStation Mode
+beq mode 1 preventStorm
+beqz mode stopSound
+j start
+
+preventStorm:
+l remainingTime wStation NextWeatherEventTime
+floor remainingTime remainingTime
+mod modTime remainingTime TIMESTEP
+s db Setting remainingTime
+beq remainingTime LIMITTIME alertMe
+bgtz modTime start
+s hardSuit SoundAlert Sound.StormIncoming
+sleep 2
+s hardSuit SoundAlert Sound.None
+j start
+
+stopSound:
+l sound hardSuit SoundAlert
+beqz sound start
+s hardSuit SoundAlert Sound.None
+j start
+
+alertMe:
+s hardSuit SoundAlert Sound.Alarm2
+sleep 2
+s hardSuit SoundAlert Sound.None
+j start
