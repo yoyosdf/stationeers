@@ -1,0 +1,52 @@
+define RBATTERIES -1125305264
+
+
+alias Uplink d0
+alias Computer d1
+alias UmbPower d2
+
+alias State r0
+alias StateSlave r1
+alias BattRatio r2
+alias UmbId r3
+
+start:
+yield
+l State Computer On
+jal checkUplink
+beqz State start #turn off script
+lb BattRatio RBATTERIES Ratio Average
+slt State BattRatio 1
+jal checkBatteries
+s db Setting BattRatio
+j start
+
+checkUplink:
+l StateSlave Uplink On
+beq StateSlave State ra
+s Uplink On State
+j ra
+
+checkBatteries:
+l StateSlave UmbPower Open
+beq StateSlave State ra
+sb RBATTERIES On State
+push ra
+l UmbId UmbPower ReferenceId
+bgtzal State extendUmbilical
+jal retractUmbilical
+pop ra
+j ra
+
+extendUmbilical:
+sd UmbId On 1
+yield
+sd UmbId Open 1
+sleep 3
+j ra
+
+retractUmbilical:
+sd UmbId Open 0
+sleep 3
+sd UmbId On 0
+j ra
