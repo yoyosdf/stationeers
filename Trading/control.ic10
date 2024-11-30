@@ -1,0 +1,74 @@
+define computer 118819
+define landingPad 118640
+define vendingMachine 118823
+define LEDS -815193061
+define LEDMIN 125441
+define LEDWAT 125442
+define LEDINT 125763
+define DIALSEARCH 218888
+define ICSEARCH 218875
+
+alias sat d0
+alias dialH d1
+alias dialV d2
+alias ledH d3
+alias ledV d4
+alias ledStrength d5
+
+alias currentValue r0
+alias on r3
+
+s dialH Mode 360
+s dialV Mode 90
+
+start:
+yield
+ld on computer On
+beqz on stopAll
+bgtzal on startAll
+l currentValue sat Horizontal
+s ledH Setting currentValue
+l currentValue sat Vertical
+s ledV Setting currentValue
+l currentValue sat SignalStrength
+s ledStrength Setting currentValue
+l currentValue sat MinimumWattsToContact
+sd LEDMIN Setting currentValue
+l currentValue sat WattsReachingContact
+sd LEDWAT Setting currentValue
+l currentValue sat InterrogationProgress
+sd LEDINT Setting currentValue
+l currentValue sat SignalID
+s db Setting currentValue
+ld currentValue DIALSEARCH Setting
+bgtz currentValue changeDials
+l currentValue dialH Setting
+s sat Horizontal currentValue
+l currentValue dialV Setting
+s sat Vertical currentValue
+j start
+
+changeDials:
+l currentValue sat Horizontal
+s dialH Setting currentValue
+l currentValue sat Vertical
+s dialV Setting currentValue
+j start
+
+stopAll:
+sb LEDS On 0
+s sat On 0
+s ledStrength On 0
+sd landingPad On 0
+sd vendingMachine On 0
+sd ICSEARCH On 0
+j start
+
+startAll:
+sb LEDS On 1
+s sat On 1
+s ledStrength On 1
+sd landingPad On 1
+sd vendingMachine On 1
+sd ICSEARCH On 1
+j ra

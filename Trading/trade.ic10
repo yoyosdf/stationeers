@@ -1,0 +1,116 @@
+push HASH("OreTrader")
+push HASH("AlloyTrader")
+push HASH("FoodTrader")
+push HASH("HydroponicsTrader")
+push HASH("GasTrader")
+push HASH("Construction Trader")
+push HASH("LiquidTrader")
+push HASH("HardwareTrader")
+push HASH("ConsumablesTrader")
+push HASH("ApplianceTrader")
+
+define MINWATTS 6000
+define STEP 5
+
+alias sat d0
+alias dial d1
+
+alias ctId r0
+alias signalId r1
+alias selectedCtId r2
+alias minWatts r3
+alias wattsReaching r4
+alias idle r5
+alias currentVal r6
+alias lastSelectedCtId r7
+alias newWattsReaching r8
+alias state r9 #0. rechH,1. monterH,2. descendreH,3. rechV,4. monterV,5. descendreV,6. ok
+s sat Activate 1
+s dial Mode 10
+
+init:
+s sat Activate 0
+move lastSelectedCtId selectedCtId
+move state 0
+s sat BestContactFilter -1
+start:
+yield
+l ctId sat ContactTypeId
+l sp dial Setting
+beqz sp start
+s db Setting state
+peek selectedCtId
+bne selectedCtId lastSelectedCtId init
+beq ctId selectedCtId signalOk
+j start
+
+signalOk:
+l currentVal sat SignalID
+s sat BestContactFilter currentVal
+l wattsReaching sat WattsReachingContact
+blt wattsReaching MINWATTS searchH
+bgt state 5 contact
+move state 6 #le MINWATTS peut etre atteint avant la fin
+j contact
+
+moveH:
+s sat Horizontal currentVal
+j waitMove
+moveV:
+s sat Vertical currentVal
+waitMove:
+yield
+l idle sat Idle
+breqz idle -2
+yield
+l newWattsReaching sat WattsReachingContact
+s db Setting newWattsReaching
+breq newWattsReaching -1 -2
+j ra
+
+searchH:
+bgt state 2 searchV
+l currentVal sat Horizontal
+brgt state 1 3 #pas besoin de monter
+add currentVal currentVal STEP
+brlt state 2 2 #pas besoin de descendre
+sub currentVal currentVal STEP
+jal moveH
+blt newWattsReaching wattsReaching endH
+select state state state 1 #on garde state si > 1 sinon 1 (montee)
+j start
+endH:
+select state state 3 2 #on passe a 3 (fin) sinon 2 (descente)
+j start
+
+searchV:
+bgt state 5 start
+l currentVal sat Vertical
+brgt state 4 3 #pas besoin de monter (recherche en descente)
+add currentVal currentVal STEP
+brlt state 5 2 #pas besoin de descendre (recherche ou recherche en montee)
+sub currentVal currentVal STEP
+jal moveV
+blt newWattsReaching wattsReaching endV
+sgt currentVal state 3
+select state currentVal state 4 #on garde state si > 1 sinon 4 (montee)
+j start
+endV:
+sgt currentVal state 3 #etape 4 ou 5 ?
+select state currentVal 6 5 #on passe a 6 (fin) sinon 5 (descente)
+j start
+
+contact:
+l currentVal sat InterrogationProgress
+beq currentVal 1 land
+bgtz currentVal start
+s db Setting 150
+s sat Activate 1
+j start
+
+land:
+beq state 7 start
+sleep 1
+s sat Activate 1
+move state 7
+j start
