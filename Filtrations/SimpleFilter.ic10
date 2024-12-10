@@ -1,0 +1,14 @@
+alias self db
+alias pump d0
+
+alias value r0
+
+start:
+yield
+l value self PressureInput
+sgtz value value
+s self Mode value
+l value self PressureOutput
+sgtz value value
+s pump On value
+j start
