@@ -1,0 +1,49 @@
+push -1301215609
+push -404336834
+push 226410516
+define STACKER 16653
+alias occupantHash r0
+alias hashEqual r1
+alias hashToCheck r2
+alias currentIndex r3
+
+alias splitter d0
+jal initSplitter
+alias splitter d1
+jal initSplitter
+alias splitter d2
+jal initSplitter
+
+start:
+yield
+move sp 1
+move currentIndex 0
+next:
+jal checkSplitter
+add sp sp 1
+add currentIndex currentIndex 1
+beq currentIndex 3 start
+j next
+
+checkSplitter:
+alias splitter dr3
+bdns splitter ra
+peek hashToCheck
+ls occupantHash splitter 0 OccupantHash
+beqz occupantHash ra
+sd STACKER On 0
+seq hashEqual occupantHash hashToCheck
+s splitter Mode hashEqual
+s splitter On 1
+yield
+s splitter Mode 0
+s splitter On 0
+sd STACKER On 1
+j ra
+
+initSplitter:
+bdns splitter ra
+s splitter Setting 0
+s splitter SettingOutput 0
+s splitter On 0
+j ra
