@@ -1,0 +1,11 @@
+#active ou non la filtration lorsque l'input contient du gaz
+alias self db
+
+alias value r0
+
+start:
+yield
+l value self PressureInput
+sgtz value value
+s self Mode value
+j start
