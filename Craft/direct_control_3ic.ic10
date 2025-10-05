@@ -1,14 +1,14 @@
-define AUTOLATHE 925
-define ELECTROPRINT 2127
-define PIPEBENDER 23045
+alias AUTOLATHE 2226
+alias ELECTROPRINT 3396
+alias PIPEBENDER 23045
 
-define ASTACKER 17855
-define ESTACKER 17858
-define PSTACKER 23253
+alias ASTACKER 17855
+alias ESTACKER 17858
+alias PSTACKER 23253
 
-define ICA 32985
-define ICE 32986
-define ICP 32987
+alias ICA 2226
+alias ICE 3396
+alias ICP 5365
 
 define SENSORS 322782515
 define LIGHTS -1860064656
@@ -50,16 +50,16 @@ sb LIGHTS On occupied
 j ra
 
 checkMachine:
-ld on machine On
+l on machine On
 bgtz on icOn
-ld on stacker On
+l on stacker On
 beqz on icOff
 j ra
 
  icOn:
-sd icShip On 1
+s icShip On 1
 j ra
 
  icOff:
-sd icShip On 0
+s icShip On 0
 j ra
