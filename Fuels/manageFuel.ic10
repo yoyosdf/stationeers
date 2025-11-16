@@ -1,53 +1,70 @@
 alias tFuel d0
 alias pVOL d1
 alias pO2 d2
-
 alias tFuelNOS d3
-alias pVOLNOS d4
+alias pVOL.NOS d4
 alias pNOS d5
 
-define minFuel 1000
+define minFuel 2000
+define maxFuel 3000
 define minRatioO2 0.33
+define minRatioVOL 0.67
+define minFuelNOS 150
+define maxFuelNOS 250
 define minRatioNOS 0.5
 
-alias tPressure r0
+alias pressure r0
 alias tRatio r1
+alias on r2
+alias settings r3
+alias settingsNotZero r4
+alias pressureIsZero r5
+alias needStop r6
+alias furnace r7
+
+move furnace 98095
 
  start:
 yield
-l tPressure tFuel Pressure
-blt tPressure minFuel prepare
-s pVOL On 0
+l pressure tFuel Pressure
+bltal pressure minFuel startVOL
+bgtal pressure maxFuel stopVOL
 l tRatio tFuel RatioOxygen
-blt tRatio minRatioO2 equilibrate
-s pO2 On 0
+slt on tRatio minRatioO2
+s pO2 On on
 
-l tPressure tFuelNOS Pressure
-blt tPressure minFuel prepareNOS
-s pVOLNOS On 0
+l pressure tFuelNOS Pressure
+bltal pressure minFuelNOS startVOLNOS
+bgtal pressure maxFuelNOS stopVOLNOS
 l tRatio tFuelNOS RatioNitrousOxide
-blt tRatio minRatioNOS equilibrateNOS
-s pNOS On 0
+slt on tRatio minRatioNOS
+s pNOS On on
 
-s db Setting 0
+l settings furnace SettingOutput
+sgtz settingsNotZero settings
+l pressure furnace Pressure
+seqz pressureIsZero pressure
+and needStop settingsNotZero pressureIsZero
+bgtzal needStop stopFurnace
 j start
 
- prepare:
-s db Setting 1
+startVOL:
 s pVOL On 1
-j start
+j ra
 
- equilibrate:
-s db Setting 1
-s pO2 On 1
-j start
+stopVOL:
+s pVOL On 0
+j ra
 
- prepareNOS:
-s db Setting 1
-s pVOLNOS On 1
-j start
+startVOLNOS:
+s pVOL.NOS On 1
+j ra
 
- equilibrateNOS:
-s db Setting 1
-s pNOS On 1
-j start
+stopVOLNOS:
+s pVOL.NOS On 0
+j ra
+
+stopFurnace:
+s furnace SettingOutput 0
+s furnace On 0
+j ra
