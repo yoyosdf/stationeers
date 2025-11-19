@@ -1,47 +1,99 @@
-define centrifuge1 130086
-define centrifuge2 130887
-#define centrifuge3 59485
-define MAXREAGENTS 3000
-define CENTRIFUGES 1238905683
+define centrifuge1 221984
+define centrifuge2 216888
+alias splitter d2
 
-alias silo d0
-alias nbReagents r0
-alias centrifuge r1
-alias rpm r2
-alias occupied r3
-alias open r4
+define MAXREAGENTS 3000
+define MAXTIME 60
+
+s splitter Setting 0
+s splitter SettingOutput 0
+
+alias occupied r0
+alias mode r1
+alias centrifuge r2
+alias timer r3
+alias timer1 r4
+alias timer2 r5
+alias nbReagents r6
+alias on r7
+alias rpm r8
+alias open r9
+alias stress r10
+alias pressure r11
 
 start:
 yield
-lbs occupied CENTRIFUGES 0 Occupied Minimum
-seqz open occupied
-s silo Open open
 move centrifuge centrifuge1
-jal checkCentrifugez
-move centrifuge centrifuge2
+
+#gestion de la distribution
+ls occupied centrifuge 0 Occupied
+select mode occupied 0 1
+s splitter Mode mode
+
+#gestion de l'allumage du splitter
+ls occupied splitter 0 Occupied
+s splitter On occupied
+
+move timer timer1
 jal checkCentrifuge
-#move centrifuge centrifuge3
-#jal checkCentrifuge
+move timer1 timer
+
+move centrifuge centrifuge2
+move timer timer2
+jal checkCentrifuge
+move timer2 timer
+
 j start
 
-checkCentrifuge:
-ld nbReagents centrifuge Reagents
+ checkCentrifuge:
+l open centrifuge Open
+l nbReagents centrifuge Reagents
+ls occupied centrifuge 0 Occupied
+l on centrifuge On
+l rpm centrifuge Rpm
+l stress centrifuge Stress
+l pressure centrifuge Pressure
+
 push ra
-bgeal nbReagents MAXREAGENTS purgeCentrifuge
+beqzal on needOpen #si eteinte on check le contenu
+bgeal nbReagents MAXREAGENTS needPurge #si pleine on essaye de purge
+beqzal occupied needStop #si pas d'input arret de la machine
+bgtzal open needClose #si vide on ferme
+bgtzal occupied needStart #on verifie si besoin de demarrer
 pop ra
 j ra
 
-purgeCentrifuge:
-sd centrifuge On 0
-sd centrifuge Throttle 0
-sd centrifuge CombustionLimiter 0
-yield
-ld rpm centrifuge Rpm
-brge rpm 1 -2
-sd centrifuge Open 1
-yield
-ld nbReagents centrifuge Reagents
-brge nbReagents 1 -2
-sd centrifuge Open 0
-sd centrifuge On 1
+ needPurge:
+beqz on ra #deja eteinte rien a faire
+s centrifuge On 0
+s centrifuge Throttle 0
+s centrifuge CombustionLimiter 0
+j ra
+
+ needOpen:
+bgt rpm 1 ra #si pas a l'arret rien a faire
+beqz nbReagents ra #si vide rien a faire
+s centrifuge Open 1
+j ra
+
+needStop:
+beqz on ra #deja eteinte rien a faire
+add timer timer 1
+blt timer MAXTIME ra
+move timer 0
+j needPurge
+
+needClose:
+bgtz nbReagents ra #pas vide rien a faire
+s centrifuge Open 0
+j ra
+
+needStart:
+move timer 0
+bgtz on ra #si allumee rien a faire
+bgt rpm 1 ra #si elle tourne rien a faire
+bgtz open ra #si ouverte rien a faire car elle se vide
+bgtz stress ra #si stressee rien a faire
+bgtz pressure ra #si pressurisee rien a faire
+s centrifuge On 1
 j ra
