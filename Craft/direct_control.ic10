@@ -1,15 +1,4 @@
-alias AUTOLATHE 2226
-alias ELECTROPRINT 3396
-alias PIPEBENDER 23045
-
-alias ASTACKER 17855
-alias ESTACKER 17858
-alias PSTACKER 23253
-
-alias ICA 2226
-alias ICE 3396
-alias ICP 5365
-
+#script permettant de controller les ic machines (evite la surconso)
 define SENSORS 322782515
 define LIGHTS -1860064656
 define TIMERTICKS 10
@@ -26,17 +15,29 @@ yield
 lb occupied SENSORS Activate Maximum
 lb on LIGHTS On Maximum
 bne occupied on changeLights
-move machine AUTOLATHE
-move stacker ASTACKER
-move icShip ICA
+move machine 36597
+move stacker 36668
+move icShip 37117
 jal checkMachine
-move machine ELECTROPRINT
-move stacker ESTACKER
-move icShip ICE
+move machine 36584
+move stacker 36620
+move icShip 37118
 jal checkMachine
-move machine PIPEBENDER
-move stacker PSTACKER
-move icShip ICP
+move machine 36496
+move stacker 36401
+move icShip 37119
+jal checkMachine
+move machine 37768
+move stacker 37793
+move icShip 37819
+jal checkMachine
+move machine 2127
+move stacker 17858
+move icShip 32986
+jal checkMachine
+move machine 23045
+move stacker 23253
+move icShip 32987
 jal checkMachine
 j start
 
@@ -50,16 +51,17 @@ sb LIGHTS On occupied
 j ra
 
 checkMachine:
-l on machine On
+bdns machine ra
+ld on machine On
 bgtz on icOn
-l on stacker On
+ld on stacker On
 beqz on icOff
 j ra
 
  icOn:
-s icShip On 1
+sd icShip On 1
 j ra
 
  icOff:
-s icShip On 0
+sd icShip On 0
 j ra

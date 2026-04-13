@@ -1,3 +1,4 @@
+#permet de controller une machine et son stacker associe
 define TIMERTICKS 60
 define MAXSETTING 500
 alias Fab d1
